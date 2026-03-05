@@ -1,815 +1,692 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Digi Pulse • Service Health</title>
-
-    <!-- Optional: browser tab icon -->
-    <link rel="icon" href="logo1.png" />
-
-    <style>
-        :root {
-            --bg: #0b0d12;
-            --panel: rgba(255, 255, 255, .06);
-            --panel2: rgba(255, 255, 255, .09);
-            --text: rgba(255, 255, 255, .92);
-            --muted: rgba(255, 255, 255, .62);
-            --stroke: rgba(255, 255, 255, .10);
-            --shadow: 0 12px 40px rgba(0, 0, 0, .35);
-            --ok: #2ee59d;
-            --down: #ff4d6d;
-            --warn: #ffd166;
-            --chip: rgba(255, 255, 255, .08);
-            --focus: rgba(120, 160, 255, .35);
-            --radius: 18px;
-            --brand: rgba(46, 229, 157, .9);
-        }
-
-        @media (prefers-color-scheme: light) {
-            :root {
-                --bg: #f6f7fb;
-                --panel: rgba(0, 0, 0, .04);
-                --panel2: rgba(0, 0, 0, .06);
-                --text: rgba(10, 12, 18, .92);
-                --muted: rgba(10, 12, 18, .62);
-                --stroke: rgba(0, 0, 0, .10);
-                --shadow: 0 14px 40px rgba(10, 12, 18, .12);
-                --chip: rgba(0, 0, 0, .05);
-                --focus: rgba(90, 120, 255, .25);
-                --brand: rgba(20, 160, 110, .95);
-            }
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            height: 100%;
-        }
-
-        body {
-            margin: 0;
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-            background:
-                radial-gradient(1200px 600px at 10% 10%, rgba(90, 120, 255, .18), transparent 60%),
-                radial-gradient(900px 500px at 90% 20%, rgba(46, 229, 157, .14), transparent 55%),
-                radial-gradient(900px 500px at 30% 90%, rgba(255, 77, 109, .12), transparent 55%),
-                var(--bg);
-            color: var(--text);
-        }
-
-        .wrap {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 24px 18px 40px;
-        }
-
-        header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        .brandRow {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 6px;
-        }
-
-        .brandLogo {
-            width: 400px;
-            height: 200px;
-            border-radius: 12px;
-            object-fit: contain;
-            background: rgba(255, 255, 255, .04);
-            border: 1px solid var(--stroke);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .22);
-        }
-
-        @media (prefers-color-scheme: light) {
-            .brandLogo {
-                background: rgba(0, 0, 0, .02);
-            }
-        }
-
-        .title {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-width: 280px;
-        }
-
-        .title h1 {
-            margin: 0;
-            font-size: clamp(20px, 2.1vw, 28px);
-            letter-spacing: -0.02em;
-            font-weight: 760;
-            line-height: 1.12;
-        }
-
-        .title h1 .accent {
-            color: var(--brand);
-            font-weight: 820;
-        }
-
-        .subtitle {
-            color: var(--muted);
-            font-size: 13px;
-            line-height: 1.35;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 999px;
-            display: inline-block;
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, .05);
-        }
-
-        .dot.ok {
-            background: var(--ok);
-            box-shadow: 0 0 0 4px rgba(46, 229, 157, .14);
-        }
-
-        .dot.down {
-            background: var(--down);
-            box-shadow: 0 0 0 4px rgba(255, 77, 109, .14);
-        }
-
-        .dot.warn {
-            background: var(--warn);
-            box-shadow: 0 0 0 4px rgba(255, 209, 102, .16);
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .card {
-            background: linear-gradient(180deg, var(--panel2), var(--panel));
-            border: 1px solid var(--stroke);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .toolbar {
-            padding: 14px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .search {
-            flex: 1 1 240px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            padding: 10px 12px;
-            border-radius: 14px;
-            border: 1px solid var(--stroke);
-            background: rgba(255, 255, 255, .05);
-        }
-
-        @media (prefers-color-scheme: light) {
-            .search {
-                background: rgba(0, 0, 0, .03);
-            }
-        }
-
-        .search svg {
-            opacity: .75;
-            flex: 0 0 auto;
-        }
-
-        .search input {
-            width: 100%;
-            border: none;
-            outline: none;
-            background: transparent;
-            color: var(--text);
-            font-size: 14px;
-        }
-
-        .search input::placeholder {
-            color: var(--muted);
-        }
-
-        .seg {
-            display: flex;
-            gap: 6px;
-            padding: 6px;
-            border-radius: 14px;
-            border: 1px solid var(--stroke);
-            background: rgba(255, 255, 255, .05);
-        }
-
-        @media (prefers-color-scheme: light) {
-            .seg {
-                background: rgba(0, 0, 0, .03);
-            }
-        }
-
-        .seg button {
-            border: none;
-            background: transparent;
-            color: var(--muted);
-            padding: 8px 10px;
-            border-radius: 10px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 140ms ease;
-            user-select: none;
-        }
-
-        .seg button.active {
-            background: rgba(255, 255, 255, .10);
-            color: var(--text);
-        }
-
-        @media (prefers-color-scheme: light) {
-            .seg button.active {
-                background: rgba(0, 0, 0, .06);
-            }
-        }
-
-        .btn {
-            border: 1px solid var(--stroke);
-            background: rgba(255, 255, 255, .05);
-            color: var(--text);
-            padding: 10px 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 140ms ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            user-select: none;
-        }
-
-        @media (prefers-color-scheme: light) {
-            .btn {
-                background: rgba(0, 0, 0, .03);
-            }
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .btn:active {
-            transform: translateY(0px);
-            opacity: .9;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            padding: 14px;
-        }
-
-        @media (max-width: 900px) {
-            .grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 560px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .svc {
-            border-radius: 16px;
-            border: 1px solid var(--stroke);
-            background: rgba(255, 255, 255, .04);
-            padding: 14px 14px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            min-height: 86px;
-            transition: 160ms ease;
-        }
-
-        @media (prefers-color-scheme: light) {
-            .svc {
-                background: rgba(0, 0, 0, .02);
-            }
-        }
-
-        .svc:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, .06);
-        }
-
-        @media (prefers-color-scheme: light) {
-            .svc:hover {
-                background: rgba(0, 0, 0, .03);
-            }
-        }
-
-        .svcTop {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .name {
-            font-weight: 650;
-            letter-spacing: -0.01em;
-            line-height: 1.2;
-            font-size: 14px;
-        }
-
-        .badge {
-            flex: 0 0 auto;
-            padding: 6px 10px;
-            border-radius: 999px;
-            border: 1px solid var(--stroke);
-            background: var(--chip);
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--muted);
-        }
-
-        .badge strong {
-            color: var(--text);
-            font-weight: 700;
-        }
-
-        .meter {
-            height: 8px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, .07);
-            overflow: hidden;
-            border: 1px solid var(--stroke);
-        }
-
-        @media (prefers-color-scheme: light) {
-            .meter {
-                background: rgba(0, 0, 0, .05);
-            }
-        }
-
-        .bar {
-            height: 100%;
-            width: 100%;
-            transform-origin: left;
-            transform: scaleX(0);
-            transition: 220ms ease;
-        }
-
-        .svc.ok .bar {
-            background: linear-gradient(90deg, rgba(46, 229, 157, .85), rgba(46, 229, 157, .35));
-            transform: scaleX(1);
-        }
-
-        .svc.down .bar {
-            background: linear-gradient(90deg, rgba(255, 77, 109, .85), rgba(255, 77, 109, .35));
-            transform: scaleX(1);
-        }
-
-        .footerRow {
-            padding: 0 14px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            color: var(--muted);
-            font-size: 12px;
-            flex-wrap: wrap;
-        }
-
-        .pillRow {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .pill {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
-            border-radius: 999px;
-            border: 1px solid var(--stroke);
-            background: var(--chip);
-            color: var(--muted);
-        }
-
-        .pill b {
-            color: var(--text);
-            font-weight: 750;
-        }
-
-        .state {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .spinner {
-            width: 14px;
-            height: 14px;
-            border-radius: 999px;
-            border: 2px solid rgba(255, 255, 255, .18);
-            border-top-color: rgba(255, 255, 255, .75);
-            animation: spin 900ms linear infinite;
-        }
-
-        @media (prefers-color-scheme: light) {
-            .spinner {
-                border-color: rgba(0, 0, 0, .14);
-                border-top-color: rgba(0, 0, 0, .55);
-            }
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .error {
-            margin-top: 12px;
-            padding: 12px 14px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 77, 109, .35);
-            background: rgba(255, 77, 109, .10);
-            color: rgba(255, 255, 255, .88);
-            display: none;
-            white-space: pre-wrap;
-        }
-
-        @media (prefers-color-scheme: light) {
-            .error {
-                color: rgba(10, 12, 18, .88);
-            }
-        }
-
-        .error.show {
-            display: block;
-        }
-
-        .mono {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Service Status Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #0b121d;
+      --bg-2: #101a2b;
+      --panel: rgba(13, 22, 37, 0.72);
+      --panel-soft: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.14);
+      --text: #e7eefc;
+      --muted: #9aa8c6;
+      --ok: #3fe38d;
+      --down: #ff6d8f;
+      --accent: #64b6ff;
+      --glow: 0 22px 60px rgba(0, 0, 0, 0.35);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Manrope", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(800px 450px at 10% -10%, rgba(100, 182, 255, 0.30), transparent 60%),
+        radial-gradient(900px 550px at 100% 10%, rgba(63, 227, 141, 0.18), transparent 58%),
+        linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glow);
+      backdrop-filter: blur(10px);
+    }
+
+    .top {
+      padding: 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(24px, 4vw, 34px);
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      display: inline-block;
+      background: #ffce67;
+      box-shadow: 0 0 0 4px rgba(255, 206, 103, 0.18);
+    }
+
+    .dot.ok {
+      background: var(--ok);
+      box-shadow: 0 0 0 4px rgba(63, 227, 141, 0.2);
+    }
+
+    .dot.down {
+      background: var(--down);
+      box-shadow: 0 0 0 4px rgba(255, 109, 143, 0.2);
+    }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    button, select, input {
+      font: inherit;
+      color: var(--text);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 10px 12px;
+    }
+
+    select {
+      background-color: #132038;
+      color: var(--text);
+    }
+
+    select option {
+      background-color: #132038;
+      color: var(--text);
+    }
+
+    select:focus,
+    input:focus,
+    button:focus {
+      outline: 2px solid rgba(100, 182, 255, 0.55);
+      outline-offset: 1px;
+    }
+
+    button { cursor: pointer; }
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(120deg, rgba(100, 182, 255, 0.85), rgba(63, 227, 141, 0.8));
+      color: #04111f;
+      border: none;
+      font-weight: 800;
+    }
+
+    .metrics {
+      padding: 0 22px 20px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--panel-soft);
+      padding: 12px;
+    }
+
+    .metric .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; }
+    .metric .v { margin-top: 6px; font-size: 26px; font-weight: 800; }
+
+    .main { display: grid; gap: 18px; }
+
+    .services { padding: 18px; }
+
+    .toolbar {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr auto auto;
+      margin-bottom: 12px;
+    }
+
+    .status-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-height: 560px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .name { font-weight: 700; line-height: 1.25; }
+
+    .badge {
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .badge.up { color: var(--ok); }
+    .badge.down { color: var(--down); }
+
+    .bar-wrap {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .bar { height: 100%; width: 100%; }
+    .bar.up { background: linear-gradient(90deg, var(--ok), rgba(63, 227, 141, 0.25)); }
+    .bar.down { background: linear-gradient(90deg, var(--down), rgba(255, 109, 143, 0.25)); }
+
+    .field { display: grid; gap: 6px; }
+    .field label { color: var(--muted); font-size: 13px; }
+
+    .hint { color: var(--muted); font-size: 12px; line-height: 1.4; }
+
+    .state {
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    .state.error { color: var(--down); }
+    .state.ok { color: var(--ok); }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 10, 19, 0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+      place-items: center;
+      z-index: 30;
+      padding: 14px;
+    }
+
+    .modal-backdrop.show { display: grid; }
+
+    .modal {
+      width: min(540px, 100%);
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 18px;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .icon-btn {
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+
+    @media (max-width: 980px) {
+      .status-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 14px; }
+      .toolbar { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="wrap">
-        <header>
-            <div class="title">
-                <div class="brandRow">
-                    <img class="brandLogo" src="logo1.png" alt="Digi Pulse logo" />
-                    <div>
-                        <h1><span class="accent">Digi</span> Pulse</h1>
-                        <div class="subtitle">
-                            <span id="overallDot" class="dot warn"></span>
-                            <span id="overallText">Loading…</span>
-                            <span>•</span>
-                            <span id="updatedText">Last updated: —</span>
-                        </div>
-                    </div>
-                </div>
+  <div class="container">
+    <section class="card">
+      <div class="top">
+        <div>
+          <h1>Service Status Console</h1>
+          <div class="sub">
+            <span id="overallDot" class="dot"></span>
+            <span id="overallText">Loading...</span>
+            <span>|</span>
+            <span id="lastUpdated">Last updated: -</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="refreshBtn" type="button">Refresh</button>
+          <button id="autoBtn" type="button">Auto: On</button>
+          <button id="openUpdateModal" class="btn-primary" type="button">Change Status</button>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="k">Total</div><div id="totalCount" class="v">0</div></div>
+        <div class="metric"><div class="k">Up</div><div id="upCount" class="v">0</div></div>
+        <div class="metric"><div class="k">Down</div><div id="downCount" class="v">0</div></div>
+      </div>
+    </section>
+
+    <section class="main">
+      <article class="card services">
+        <div class="toolbar">
+          <input id="searchInput" type="text" placeholder="Search services" autocomplete="off" />
+          <select id="filterSelect">
+            <option value="all">All</option>
+            <option value="up">Up only</option>
+            <option value="down">Down only</option>
+          </select>
+          <div class="state" id="fetchState">Idle</div>
+        </div>
+        <div class="status-grid" id="serviceGrid"></div>
+      </article>
+    </section>
+  </div>
+
+  <div id="updateModalBackdrop" class="modal-backdrop" aria-hidden="true">
+    <section class="card modal" role="dialog" aria-modal="true" aria-labelledby="updateModalTitle">
+      <div class="modal-head">
+        <h2 id="updateModalTitle">Update Service Status</h2>
+        <button id="closeUpdateModal" class="icon-btn" type="button" aria-label="Close">x</button>
+      </div>
+      <div class="field">
+        <label for="serviceSelect">Service</label>
+        <select id="serviceSelect"></select>
+      </div>
+      <div class="field">
+        <label for="statusSelect">Status</label>
+        <select id="statusSelect">
+          <option value="true">Up</option>
+          <option value="false">Down</option>
+        </select>
+      </div>
+      <button id="updateBtn" class="btn-primary" type="button">Update Status</button>
+      <div class="hint">Status payload: <code>{ "name": "...", "up": true|false }</code></div>
+      <div class="hint">Webhook payload: <code>{ "services": [{ "name": "...", "up": true|false }] }</code></div>
+      <div class="hint">GET: <code id="readEndpoint"></code><br />POST: <code id="writeEndpoint"></code><br />Webhook: <code id="webhookEndpoint"></code></div>
+      <div class="state" id="updateState"></div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const READ_ENDPOINT = "https://spathose-hygienically-sarita.ngrok-free.dev/services";
+      const WRITE_ENDPOINT = "https://spathose-hygienically-sarita.ngrok-free.dev/services/status";
+      const WEBHOOK_ENDPOINT = "https://prod-10.norwayeast.logic.azure.com:443/workflows/1b7bd1f1febf499e929d98feb2c46839/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=lTZN9aAV_YvMH7nhJKzCBPyadgNNtnWoY5YsPXzh-ck";
+      const AUTO_REFRESH_MS = 30000;
+      const COMMON_HEADERS = {
+        "Accept": "application/json",
+        "ngrok-skip-browser-warning": "true"
+      };
+
+      const state = {
+        services: [],
+        query: "",
+        filter: "all",
+        auto: true,
+        timer: null
+      };
+
+      const el = {
+        overallDot: document.getElementById("overallDot"),
+        overallText: document.getElementById("overallText"),
+        lastUpdated: document.getElementById("lastUpdated"),
+        totalCount: document.getElementById("totalCount"),
+        upCount: document.getElementById("upCount"),
+        downCount: document.getElementById("downCount"),
+        refreshBtn: document.getElementById("refreshBtn"),
+        autoBtn: document.getElementById("autoBtn"),
+        openUpdateModal: document.getElementById("openUpdateModal"),
+        closeUpdateModal: document.getElementById("closeUpdateModal"),
+        updateModalBackdrop: document.getElementById("updateModalBackdrop"),
+        searchInput: document.getElementById("searchInput"),
+        filterSelect: document.getElementById("filterSelect"),
+        fetchState: document.getElementById("fetchState"),
+        serviceGrid: document.getElementById("serviceGrid"),
+        serviceSelect: document.getElementById("serviceSelect"),
+        statusSelect: document.getElementById("statusSelect"),
+        updateBtn: document.getElementById("updateBtn"),
+        updateState: document.getElementById("updateState"),
+        readEndpoint: document.getElementById("readEndpoint"),
+        writeEndpoint: document.getElementById("writeEndpoint"),
+        webhookEndpoint: document.getElementById("webhookEndpoint")
+      };
+
+      el.readEndpoint.textContent = READ_ENDPOINT;
+      el.writeEndpoint.textContent = WRITE_ENDPOINT;
+      el.webhookEndpoint.textContent = WEBHOOK_ENDPOINT;
+
+      function openUpdateModal() {
+        el.updateModalBackdrop.classList.add("show");
+        el.updateModalBackdrop.setAttribute("aria-hidden", "false");
+      }
+
+      function closeUpdateModal() {
+        el.updateModalBackdrop.classList.remove("show");
+        el.updateModalBackdrop.setAttribute("aria-hidden", "true");
+      }
+
+      function formatDate(date) {
+        return new Intl.DateTimeFormat(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }).format(date);
+      }
+
+      function setFetchState(message, isError) {
+        el.fetchState.textContent = message;
+        el.fetchState.className = isError ? "state error" : "state";
+      }
+
+      function setUpdateState(message, kind) {
+        el.updateState.textContent = message || "";
+        el.updateState.className = kind ? `state ${kind}` : "state";
+      }
+
+      function computeSummary(services) {
+        const total = services.length;
+        const down = services.filter((s) => !s.up).length;
+        return { total, down, up: total - down };
+      }
+
+      function renderOverall(summary) {
+        el.totalCount.textContent = String(summary.total);
+        el.upCount.textContent = String(summary.up);
+        el.downCount.textContent = String(summary.down);
+
+        if (summary.total === 0) {
+          el.overallDot.className = "dot";
+          el.overallText.textContent = "No services available";
+          return;
+        }
+
+        if (summary.down === 0) {
+          el.overallDot.className = "dot ok";
+          el.overallText.textContent = "All systems operational";
+          return;
+        }
+
+        el.overallDot.className = "dot down";
+        el.overallText.textContent = `${summary.down} service${summary.down === 1 ? "" : "s"} down`;
+      }
+
+      function filteredServices() {
+        const q = state.query.trim().toLowerCase();
+        let items = state.services.slice();
+
+        if (q) {
+          items = items.filter((s) => s.name.toLowerCase().includes(q));
+        }
+
+        if (state.filter === "up") {
+          items = items.filter((s) => s.up);
+        } else if (state.filter === "down") {
+          items = items.filter((s) => !s.up);
+        }
+
+        return items;
+      }
+
+      function renderServices() {
+        const items = filteredServices();
+        el.serviceGrid.innerHTML = "";
+
+        if (!items.length) {
+          const empty = document.createElement("div");
+          empty.className = "item";
+          empty.innerHTML = "<div class=\"name\">No services match this filter</div>";
+          el.serviceGrid.appendChild(empty);
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+
+        for (const service of items) {
+          const item = document.createElement("div");
+          item.className = "item";
+
+          const badgeClass = service.up ? "badge up" : "badge down";
+          const barClass = service.up ? "bar up" : "bar down";
+          const label = service.up ? "Up" : "Down";
+
+          item.innerHTML = `
+            <div class="item-top">
+              <div class="name">${escapeHtml(service.name)}</div>
+              <div class="${badgeClass}">${label}</div>
             </div>
+            <div class="bar-wrap"><div class="${barClass}"></div></div>
+          `;
 
-            <div class="actions">
-                <button class="btn" id="refreshBtn" type="button" title="Refresh now">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M21 12a9 9 0 1 1-2.64-6.36" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" />
-                        <path d="M21 3v7h-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                    Refresh
-                </button>
+          frag.appendChild(item);
+        }
 
-                <button class="btn" id="autoBtn" type="button" title="Toggle auto-refresh">
-                    <span class="mono" id="autoLabel">Auto: 30s</span>
-                </button>
-            </div>
-        </header>
+        el.serviceGrid.appendChild(frag);
+      }
 
-        <section class="card" aria-label="Digi Pulse service health dashboard">
-            <div class="toolbar">
-                <div class="search" role="search">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                        <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" stroke="currentColor"
-                            stroke-width="2" />
-                    </svg>
-                    <input id="q" placeholder="Search services…" autocomplete="off" />
-                </div>
+      function renderServicePicker() {
+        const selected = el.serviceSelect.value;
+        el.serviceSelect.innerHTML = "";
 
-                <div class="seg" aria-label="Filter">
-                    <button type="button" class="active" data-filter="all">All</button>
-                    <button type="button" data-filter="up">Up</button>
-                    <button type="button" data-filter="down">Down</button>
-                </div>
-            </div>
+        for (const service of state.services) {
+          const opt = document.createElement("option");
+          opt.value = service.name;
+          opt.textContent = service.name;
+          el.serviceSelect.appendChild(opt);
+        }
 
-            <div class="footerRow" style="padding-top:0;">
-                <div class="pillRow" aria-label="Summary">
-                    <div class="pill"><span class="dot ok"></span><b id="countUp">—</b><span>Up</span></div>
-                    <div class="pill"><span class="dot down"></span><b id="countDown">—</b><span>Down</span></div>
-                    <div class="pill"><span class="dot warn"></span><b id="countTotal">—</b><span>Total</span></div>
-                </div>
+        if (state.services.length === 0) {
+          const opt = document.createElement("option");
+          opt.textContent = "No services loaded";
+          opt.value = "";
+          el.serviceSelect.appendChild(opt);
+        } else if (selected && state.services.some((s) => s.name === selected)) {
+          el.serviceSelect.value = selected;
+        }
+      }
 
-                <div class="state" aria-live="polite">
-                    <span id="loadingIcon" class="spinner" style="display:none;"></span>
-                    <span id="stateText">—</span>
-                </div>
-            </div>
+      async function fetchServices() {
+        const res = await fetch(READ_ENDPOINT, {
+          method: "GET",
+          mode: "cors",
+          cache: "no-store",
+          headers: COMMON_HEADERS
+        });
 
-            <div id="grid" class="grid" role="list"></div>
+        const raw = await res.text();
 
-            <div class="footerRow">
-                <div>
-                    Endpoint:
-                    <span class="mono" id="endpointText"></span>
-                </div>
-                <div class="mono" id="hintText"></div>
-            </div>
-        </section>
+        if (!res.ok) {
+          throw new Error(`GET failed: HTTP ${res.status} ${res.statusText}`);
+        }
 
-        <div id="error" class="error" role="alert"></div>
-    </div>
+        if (raw.trim().startsWith("<")) {
+          throw new Error("GET returned HTML instead of JSON");
+        }
 
-    <script>
-        (() => {
-            const PRODUCT_NAME = "Digi Pulse";
-            const LOGO_PATH = "logo1.png";
+        const data = JSON.parse(raw);
+        return Array.isArray(data && data.services) ? data.services : [];
+      }
 
-            // API endpoint
-            const ENDPOINT = "https://spathose-hygienically-sarita.ngrok-free.dev/services";
+      async function loadServices() {
+        setFetchState("Loading...", false);
 
-            // (Optional) set document title dynamically in case you reuse this template
-            document.title = `${PRODUCT_NAME} • Service Health`;
+        try {
+          const services = await fetchServices();
 
-            const state = {
-                services: [],
-                filter: "all",
-                q: "",
-                auto: true,
-                intervalMs: 30000,
-                timer: null
-            };
+          state.services = services
+            .map((s) => ({ name: String(s && s.name ? s.name : ""), up: Boolean(s && s.up) }))
+            .filter((s) => s.name)
+            .sort((a, b) => a.name.localeCompare(b.name));
 
-            const el = {
-                grid: document.getElementById("grid"),
-                error: document.getElementById("error"),
-                stateText: document.getElementById("stateText"),
-                loadingIcon: document.getElementById("loadingIcon"),
-                updatedText: document.getElementById("updatedText"),
-                overallDot: document.getElementById("overallDot"),
-                overallText: document.getElementById("overallText"),
-                endpointText: document.getElementById("endpointText"),
-                hintText: document.getElementById("hintText"),
-                countUp: document.getElementById("countUp"),
-                countDown: document.getElementById("countDown"),
-                countTotal: document.getElementById("countTotal"),
-                q: document.getElementById("q"),
-                refreshBtn: document.getElementById("refreshBtn"),
-                autoBtn: document.getElementById("autoBtn"),
-                autoLabel: document.getElementById("autoLabel"),
-                segButtons: Array.from(document.querySelectorAll(".seg button"))
-            };
+          renderOverall(computeSummary(state.services));
+          renderServices();
+          renderServicePicker();
+          el.lastUpdated.textContent = `Last updated: ${formatDate(new Date())}`;
+          setFetchState("Up to date", false);
+        } catch (err) {
+          setFetchState(String(err), true);
+          if (!state.services.length) {
+            renderOverall({ total: 0, up: 0, down: 0 });
+            renderServices();
+            renderServicePicker();
+          }
+        }
+      }
 
-            el.endpointText.textContent = ENDPOINT;
+      async function updateServiceStatus() {
+        const name = el.serviceSelect.value;
+        const up = el.statusSelect.value === "true";
 
-            const fmtTime = (d) => {
-                try {
-                    return new Intl.DateTimeFormat(undefined, {
-                        year: "numeric", month: "short", day: "2-digit",
-                        hour: "2-digit", minute: "2-digit", second: "2-digit"
-                    }).format(d);
-                } catch {
-                    return d.toLocaleString();
-                }
-            };
+        if (!name) {
+          setUpdateState("Select a service first.", "error");
+          return;
+        }
 
-            const setLoading = (on, msg) => {
-                el.loadingIcon.style.display = on ? "inline-block" : "none";
-                el.stateText.textContent = msg || (on ? "Refreshing…" : "Idle");
-            };
+        setUpdateState("Updating...", "");
+        el.updateBtn.disabled = true;
 
-            const showError = (text) => {
-                if (!text) {
-                    el.error.classList.remove("show");
-                    el.error.textContent = "";
-                    return;
-                }
-                el.error.classList.add("show");
-                el.error.textContent = text;
-            };
+        try {
+          const res = await fetch(WRITE_ENDPOINT, {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              ...COMMON_HEADERS,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, up })
+          });
 
-            const computeSummary = (services) => {
-                const total = services.length;
-                const down = services.filter(s => !s.up).length;
-                const up = total - down;
-                return { total, up, down };
-            };
+          const payload = await res.text();
+          if (!res.ok) {
+            throw new Error(`POST failed: HTTP ${res.status} ${res.statusText} ${payload ? `| ${payload.slice(0, 160)}` : ""}`);
+          }
 
-            const updateOverall = ({ total, down }) => {
-                if (total === 0) {
-                    el.overallDot.className = "dot warn";
-                    el.overallText.textContent = "No services";
-                    return;
-                }
-                if (down === 0) {
-                    el.overallDot.className = "dot ok";
-                    el.overallText.textContent = "All systems operational";
-                } else {
-                    el.overallDot.className = "dot down";
-                    el.overallText.textContent = `${down} service${down === 1 ? "" : "s"} down`;
-                }
-            };
+          let webhookMessage = "and triggered webhook.";
+          try {
+            await triggerStatusWebhook([{ name, up }]);
+          } catch (webhookErr) {
+            webhookMessage = `but webhook failed: ${String(webhookErr)}`;
+          }
 
-            const render = () => {
-                const q = state.q.trim().toLowerCase();
-                let items = state.services.slice();
+          setUpdateState(`Updated ${name} to ${up ? "Up" : "Down"} ${webhookMessage}`, webhookMessage.startsWith("and") ? "ok" : "error");
+          await loadServices();
+          closeUpdateModal();
+        } catch (err) {
+          setUpdateState(String(err), "error");
+        } finally {
+          el.updateBtn.disabled = false;
+        }
+      }
 
-                if (q) items = items.filter(s => (s.name || "").toLowerCase().includes(q));
-                if (state.filter === "up") items = items.filter(s => s.up);
-                if (state.filter === "down") items = items.filter(s => !s.up);
+      async function triggerStatusWebhook(services) {
+        const res = await fetch(WEBHOOK_ENDPOINT, {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            ...COMMON_HEADERS,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ services })
+        });
 
-                const summary = computeSummary(state.services);
-                el.countTotal.textContent = String(summary.total);
-                el.countUp.textContent = String(summary.up);
-                el.countDown.textContent = String(summary.down);
-                updateOverall(summary);
+        const raw = await res.text();
+        if (!res.ok) {
+          throw new Error(`Webhook failed: HTTP ${res.status} ${res.statusText} ${raw ? `| ${raw.slice(0, 160)}` : ""}`);
+        }
+      }
 
-                el.grid.innerHTML = "";
-                const frag = document.createDocumentFragment();
+      function setAutoRefresh(on) {
+        state.auto = on;
+        el.autoBtn.textContent = `Auto: ${on ? "On" : "Off"}`;
 
-                items.forEach((s) => {
-                    const card = document.createElement("div");
-                    card.className = `svc ${s.up ? "ok" : "down"}`;
-                    card.setAttribute("role", "listitem");
+        if (state.timer) {
+          clearInterval(state.timer);
+          state.timer = null;
+        }
 
-                    const top = document.createElement("div");
-                    top.className = "svcTop";
+        if (on) {
+          state.timer = setInterval(loadServices, AUTO_REFRESH_MS);
+        }
+      }
 
-                    const name = document.createElement("div");
-                    name.className = "name";
-                    name.textContent = s.name ?? "Unnamed service";
+      function escapeHtml(value) {
+        return value
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
 
-                    const badge = document.createElement("div");
-                    badge.className = "badge";
+      el.refreshBtn.addEventListener("click", loadServices);
+      el.autoBtn.addEventListener("click", () => setAutoRefresh(!state.auto));
+      el.openUpdateModal.addEventListener("click", openUpdateModal);
+      el.closeUpdateModal.addEventListener("click", closeUpdateModal);
+      el.updateModalBackdrop.addEventListener("click", (event) => {
+        if (event.target === el.updateModalBackdrop) {
+          closeUpdateModal();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && el.updateModalBackdrop.classList.contains("show")) {
+          closeUpdateModal();
+        }
+      });
+      el.searchInput.addEventListener("input", (event) => {
+        state.query = event.target.value;
+        renderServices();
+      });
+      el.filterSelect.addEventListener("change", (event) => {
+        state.filter = event.target.value;
+        renderServices();
+      });
+      el.updateBtn.addEventListener("click", updateServiceStatus);
 
-                    const dot = document.createElement("span");
-                    dot.className = `dot ${s.up ? "ok" : "down"}`;
-                    dot.style.width = "8px";
-                    dot.style.height = "8px";
-                    dot.style.boxShadow = "none";
-
-                    const label = document.createElement("strong");
-                    label.textContent = s.up ? "Up" : "Down";
-
-                    badge.appendChild(dot);
-                    badge.appendChild(label);
-
-                    top.appendChild(name);
-                    top.appendChild(badge);
-
-                    const meter = document.createElement("div");
-                    meter.className = "meter";
-                    const bar = document.createElement("div");
-                    bar.className = "bar";
-                    meter.appendChild(bar);
-
-                    card.appendChild(top);
-                    card.appendChild(meter);
-
-                    frag.appendChild(card);
-                    requestAnimationFrame(() => bar.style.transform = "scaleX(1)");
-                });
-
-                el.grid.appendChild(frag);
-
-                if (items.length === 0) {
-                    const empty = document.createElement("div");
-                    empty.className = "svc";
-                    empty.innerHTML = `
-            <div class="svcTop">
-              <div class="name">No matches</div>
-              <div class="badge"><strong>—</strong></div>
-            </div>
-            <div style="color: var(--muted); font-size: 13px; line-height: 1.35;">
-              Try a different search term or filter.
-            </div>`;
-                    el.grid.appendChild(empty);
-                }
-            };
-
-            // Robust fetch to avoid HTML->JSON parsing crash
-            const fetchServices = async () => {
-                const res = await fetch(ENDPOINT, {
-                    method: "GET",
-                    mode: "cors",
-                    cache: "no-store",
-                    redirect: "follow",
-                    headers: {
-                        "Accept": "application/json",
-                        "ngrok-skip-browser-warning": "true"
-                    }
-                });
-
-                const ct = (res.headers.get("content-type") || "").toLowerCase();
-                const raw = await res.text();
-
-                if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}\n\n${raw.slice(0, 600)}`);
-
-                if (raw.trim().startsWith("<")) {
-                    throw new Error(
-                        `Received HTML instead of JSON.\n` +
-                        `Content-Type: ${ct || "(missing)"}\n\n` +
-                        raw.slice(0, 900)
-                    );
-                }
-
-                return JSON.parse(raw);
-            };
-
-            const load = async () => {
-                setLoading(true, "Refreshing…");
-                showError(null);
-
-                const started = performance.now();
-                try {
-                    const data = await fetchServices();
-                    const services = Array.isArray(data?.services) ? data.services : [];
-
-                    state.services = services.map(x => ({
-                        name: String(x?.name ?? ""),
-                        up: Boolean(x?.up)
-                    })).sort((a, b) => a.name.localeCompare(b.name));
-
-                    const took = Math.max(0, Math.round(performance.now() - started));
-                    el.updatedText.textContent = `Last updated: ${fmtTime(new Date())}`;
-                    el.hintText.textContent = `Fetched in ${took}ms`;
-
-                    setLoading(false, "Up to date");
-                    render();
-                } catch (err) {
-                    setLoading(false, "Failed to load");
-                    showError(`Digi Pulse could not load service status.\n\nDetails:\n${String(err)}`);
-                    if (!state.services.length) render();
-                }
-            };
-
-            const setFilter = (f) => {
-                state.filter = f;
-                el.segButtons.forEach(b => b.classList.toggle("active", b.dataset.filter === f));
-                render();
-            };
-
-            const setAuto = (on) => {
-                state.auto = on;
-                el.autoLabel.textContent = `Auto: ${on ? (state.intervalMs / 1000 + "s") : "Off"}`;
-                el.autoBtn.style.opacity = on ? "1" : ".75";
-                if (state.timer) clearInterval(state.timer);
-                state.timer = on ? setInterval(load, state.intervalMs) : null;
-            };
-
-            el.q.addEventListener("input", (e) => { state.q = e.target.value; render(); });
-            el.segButtons.forEach(btn => btn.addEventListener("click", () => setFilter(btn.dataset.filter)));
-            el.refreshBtn.addEventListener("click", load);
-            el.autoBtn.addEventListener("click", () => setAuto(!state.auto));
-
-            setFilter("all");
-            setAuto(true);
-            load();
-        })();
-
-        // jst the comment
-    </script>
+      setAutoRefresh(true);
+      loadServices();
+    })();
+  </script>
 </body>
-
 </html>

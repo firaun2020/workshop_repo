@@ -70,7 +70,7 @@ def services():
     return jsonify({"services": list_services()}), 200
 
 
-@app.put("/services/status")
+@app.post("/services/status")
 def update_service_status():
     data = request.get_json(silent=True) or {}
     name = data.get("name")
